@@ -4939,4 +4939,31 @@ document.querySelectorAll('input[type="password"]').forEach(function(input){
   wrapper.appendChild(btn);
 });
 </script>
+<script>
+function soumettreNouvelleBD(){
+  var titre = document.querySelector('#modal-upload input[placeholder*="titre"], #modal-upload input[placeholder*="Titre"]');
+  var genre = document.querySelector('#modal-upload select');
+  var coverInput = document.querySelector('#modal-upload input[type="file"]');
+  
+  if(!titre || !titre.value){ showToast('❌ Ajoute un titre !'); return; }
+  if(!window.supabaseClient){ showToast('❌ Connexion requise !'); return; }
+  
+  showToast('⏳ Publication en cours...');
+  
+  window.supabaseClient.auth.getUser().then(function({data}){
+    if(!data.user){ showToast('❌ Tu dois être connecté !'); return; }
+    
+    window.supabaseClient.from('series').insert({
+      createur_id: data.user.id,
+      titre: titre.value,
+      genre: genre ? genre.value : '',
+      statut: 'en_cours'
+    }).then(function({error}){
+      if(error){ showToast('❌ Erreur: ' + error.message); return; }
+      closeModal('modal-upload');
+      showToast('✅ BD publiée avec succès !');
+    });
+  });
+}
+</script>
 </body></html>
