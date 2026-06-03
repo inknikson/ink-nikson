@@ -4959,27 +4959,64 @@ function afficherNbPages(input){
 }
 
 function soumettreNouvelleBD(){
-  var titre = document.querySelector('#modal-upload input[placeholder*="titre"], #modal-upload input[placeholder*="Titre"]');
-  var genre = document.querySelector('#modal-upload select');
-  var coverInput = document.querySelector('#modal-upload input[type="file"]');
-  
-  if(!titre || !titre.value){ showToast('❌ Ajoute un titre !'); return; }
+  var titreEl = document.querySelector('#modal-upload input[type="text"]');
+  var genreEl = document.querySelector('#modal-upload select');
+  var bdInput = document.getElementById('bd-input');
+  var coverInput = document.querySelector('#modal-upload input[type="file"]:not(#bd-input)');
+
+  if(!titreEl || !titreEl.value){ showToast('❌ Ajoute un titre !'); return; }
   if(!window.supabaseClient){ showToast('❌ Connexion requise !'); return; }
-  
+
   showToast('⏳ Publication en cours...');
-  
+
   window.supabaseClient.auth.getUser().then(function({data}){
     if(!data.user){ showToast('❌ Tu dois être connecté !'); return; }
-    
+    var userId = data.user.id;
+
     window.supabaseClient.from('series').insert({
-      createur_id: data.user.id,
-      titre: titre.value,
-      genre: genre ? genre.value : '',
+      createur_id: userId,
+      titre: titreEl.value,
+      genre: genreEl ? genreEl.value : '',
       statut: 'en_cours'
-    }).then(function({error}){
+    }).select().single().then(function({data: serie, error}){
       if(error){ showToast('❌ Erreur: ' + error.message); return; }
-      closeModal('modal-upload');
-      showToast('✅ BD publiée avec succès !');
+
+      var files = bdInput ? bdInput.files : null;
+      if(!files || files.length === 0){
+        closeModal('modal-upload');
+        showToast('✅ BD créée ! Ajoute des pages depuis ton espace.');
+        return;
+      }
+
+      window.supabaseClient.from('chapitres').insert({
+        serie_id: serie.id,
+        titre: 'Chapitre 1',
+        numero: 1
+      }).select().single().then(function({data: chapitre, error: err2}){
+        if(err2){ showToast('❌ Erreur chapitre: ' + err2.message); return; }
+
+        var filesArray = Array.from(files).sort(function(a,b){ return a.name.localeCompare(b.name); });
+        var uploaded = 0;
+
+        filesArray.forEach(function(file, i){
+          var filePath = userId + '/' + serie.id + '/' + String(i+1).padStart(3,'0') + '-' + file.name;
+          window.supabaseClient.storage.from('pages').upload(filePath, file).then(function({data: fileData, error: uploadErr}){
+            if(uploadErr){ console.log('Erreur upload:', uploadErr); return; }
+            var publicUrl = window.supabaseClient.storage.from('pages').getPublicUrl(fileData.path).data.publicUrl;
+            window.supabaseClient.from('pages').insert({
+              chapitre_id: chapitre.id,
+              numero: i+1,
+              image_url: publicUrl
+            }).then(function(){
+              uploaded++;
+              if(uploaded === filesArray.length){
+                closeModal('modal-upload');
+                showToast('✅ ' + uploaded + ' pages uploadées avec succès !');
+              }
+            });
+          });
+        });
+      });
     });
   });
 }
