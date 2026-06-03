@@ -4933,6 +4933,17 @@ function filterFavoris(type, btn){
 
 // CONFIRMATION INSCRIPTION
 function doRegister(){
+  const email = document.querySelector('#modal-auth input[type="email"]').value;
+  const password = document.querySelector('#modal-auth input[type="password"]').value;
+  if(!email || !password){ showToast('❌ Remplis tous les champs !'); return; }
+  supabaseClient.auth.signUp({ email, password }).then(({data, error}) => {
+    if(error){ showToast('❌ ' + error.message); return; }
+    closeModal('modal-auth');
+    openModal('modal-confirm');
+    document.getElementById('confirm-email').textContent = email;
+    showToast('✅ Vérifie ton email pour confirmer !');
+  });
+//
   const emailInput = document.querySelector('#modal-auth input[type="email"]');
   const email = emailInput ? emailInput.value || 'ton@email.com' : 'ton@email.com';
   document.getElementById('confirm-email').textContent = email;
