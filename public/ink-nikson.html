@@ -4922,4 +4922,21 @@ function doRegister(){
 
 
 
+<script>
+document.querySelectorAll('input[type="password"]').forEach(function(input){
+  var wrapper = document.createElement('div');
+  wrapper.style.cssText = 'position:relative;width:100%';
+  input.parentNode.insertBefore(wrapper, input);
+  wrapper.appendChild(input);
+  var btn = document.createElement('button');
+  btn.type = 'button';
+  btn.innerHTML = '👁️';
+  btn.style.cssText = 'position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:1rem;padding:0;z-index:10';
+  btn.onclick = function(){
+    input.type = input.type === 'password' ? 'text' : 'password';
+    btn.innerHTML = input.type === 'password' ? '👁️' : '🙈';
+  };
+  wrapper.appendChild(btn);
+});
+</script>
 </body></html>
