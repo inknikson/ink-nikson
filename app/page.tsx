@@ -10,16 +10,16 @@ export default function Home() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
   const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
   
-  const supabaseScript = `
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  const script = `<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-  window.addEventListener('load', function(){
-    window.supabaseClient = window.supabase.createClient('${supabaseUrl}', '${supabaseKey}');
-    console.log('Supabase pret !');
-  });
+window.supabaseClient = null;
+document.addEventListener('DOMContentLoaded', function(){
+  window.supabaseClient = window.supabase.createClient('${supabaseUrl}', '${supabaseKey}');
+});
 </script>`
 
-  const modifiedHtml = html.replace('</head>', supabaseScript + '</head>')
+  const finalHtml = html.replace('<meta http-equiv="Content-Security-Policy"', '<!-- CSP disabled --><meta name="csp-disabled"')
+  .replace('</body>', script + '</body>')
   
-  return <div dangerouslySetInnerHTML={{ __html: modifiedHtml }} />
+  return <div dangerouslySetInnerHTML={{ __html: finalHtml }} />
 }
