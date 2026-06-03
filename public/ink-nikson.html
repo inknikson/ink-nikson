@@ -31,6 +31,14 @@
 <link href="./INK NIKSON_files/css2" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+window.addEventListener('load', function(){
+  fetch('/api/config').then(r=>r.json()).then(cfg=>{
+    window.supabaseClient = window.supabase.createClient(cfg.url, cfg.key);
+    console.log('✅ Supabase prêt !');
+  }).catch(e => console.log('❌ Erreur config:', e));
+});
+</script>
+<script>
 const supabaseClient = supabase.createClient(
   document.currentScript ? '' : '',
   ''
