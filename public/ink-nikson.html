@@ -29,25 +29,6 @@
 <meta property="og:type" content="website">
 <!-- ======================== -->
 <link href="./INK NIKSON_files/css2" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
-window.addEventListener('load', function(){
-  fetch('/api/config').then(r=>r.json()).then(cfg=>{
-    window.supabaseClient = window.supabase.createClient(cfg.url, cfg.key);
-    console.log('✅ Supabase prêt !');
-  }).catch(e => console.log('❌ Erreur config:', e));
-});
-</script>
-<script>
-const supabaseClient = supabase.createClient(
-  document.currentScript ? '' : '',
-  ''
-);
-fetch('/api/config').then(r=>r.json()).then(cfg=>{
-  window.supabaseClient = window.supabase.createClient(cfg.url, cfg.key);
-  console.log('Supabase chargé !');
-});
-</script>
 <style>
 :root{--bg:#08060F;--violet:#7C3AED;--violet2:#A855F7;--violet3:#DDD6FE;--pink:#EC4899;--cyan:#06B6D4;--gold:#F59E0B;--white:#F0EEFF;--card:rgba(18,8,36,0.7);--border:rgba(124,58,237,0.2)}
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
@@ -2597,27 +2578,6 @@ function setFilter(genre,btn){
 document.querySelectorAll('.modal-overlay').forEach(m=>{m.addEventListener('click',function(e){if(e.target===this)this.classList.remove('open')})})
 function switchTab(tab,e){document.querySelectorAll('.auth-tab').forEach(t=>t.classList.remove('active'));document.querySelectorAll('.auth-form').forEach(f=>f.classList.remove('active'));e.target.classList.add('active');document.getElementById('form-'+tab).classList.add('active')}
 function doLogin(){
-  supabaseClient.auth.signInWithPassword({
-    email: document.querySelector('#modal-auth input[type="email"]').value,
-    password: document.querySelector('#modal-auth input[type="password"]').value
-  }).then(({data, error}) => {
-    if(error){ showToast('❌ ' + error.message); return; }
-    closeModal('modal-auth');
-    document.getElementById('nav-guest').style.display='none';
-    document.getElementById('nav-logged').style.display='block';
-    document.getElementById('mob-user-block').classList.add('show');
-    document.getElementById('mob-compte-title').style.display='block';
-    document.getElementById('mob-monespace').style.display='flex';
-    document.getElementById('mob-mesabo').style.display='flex';
-    document.getElementById('mob-favoris').style.display='flex';
-    document.getElementById('mob-gift').style.display='flex';
-    document.getElementById('mob-createur').style.display='flex';
-    document.getElementById('mob-admin').style.display='flex';
-    document.getElementById('mob-auth-btns').style.display='none';
-    document.getElementById('mob-logout-btn').style.display='block';
-    showPage('dashboard'); showToast('Connexion réussie !');
-  });
-//
   // Rate limiting — max 5 tentatives en 5 minutes
   if(!window.checkRateLimit('login', 5, 5 * 60 * 1000)){
     showToast('⚠️ Trop de tentatives. Réessaie dans 5 minutes.');
@@ -4952,43 +4912,12 @@ function filterFavoris(type, btn){
 
 // CONFIRMATION INSCRIPTION
 function doRegister(){
-  const email = document.querySelector('#modal-auth input[type="email"]').value;
-  const password = document.querySelector('#modal-auth input[type="password"]').value;
-  if(!email || !password){ showToast('❌ Remplis tous les champs !'); return; }
-  supabaseClient.auth.signUp({ email, password }).then(({data, error}) => {
-    if(error){ showToast('❌ ' + error.message); return; }
-    closeModal('modal-auth');
-    openModal('modal-confirm');
-    document.getElementById('confirm-email').textContent = email;
-    showToast('✅ Vérifie ton email pour confirmer !');
-  });
-//
   const emailInput = document.querySelector('#modal-auth input[type="email"]');
   const email = emailInput ? emailInput.value || 'ton@email.com' : 'ton@email.com';
   document.getElementById('confirm-email').textContent = email;
   closeModal('modal-auth');
   openModal('modal-confirm');
 }
-</script>
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-  var btns = document.querySelectorAll('[onclick*="showAuth"], .btn-connexion, [data-action="connexion"]');
-  btns.forEach(function(btn) {
-    btn.addEventListener('click', function(e) {
-      e.preventDefault();
-      
-    });
-  });
-  var allBtns = document.querySelectorAll('button, a');
-  allBtns.forEach(function(btn) {
-    if(btn.textContent.trim().toUpperCase().includes('CONNEXION') || btn.textContent.trim().toUpperCase().includes('S\'INSCRIRE')) {
-      btn.addEventListener('click', function(e) {
-        e.preventDefault();
-        
-      });
-    }
-  });
-});
 </script>
 
 
