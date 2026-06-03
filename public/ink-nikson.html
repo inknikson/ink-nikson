@@ -36,7 +36,8 @@ const supabaseClient = supabase.createClient(
   ''
 );
 fetch('/api/config').then(r=>r.json()).then(cfg=>{
-  window.supabaseClient = supabase.createClient(cfg.url, cfg.key);
+  window.supabaseClient = window.supabase.createClient(cfg.url, cfg.key);
+  console.log('Supabase chargé !');
 });
 </script>
 <style>
