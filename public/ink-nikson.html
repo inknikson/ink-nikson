@@ -4940,6 +4940,17 @@ document.querySelectorAll('input[type="password"]').forEach(function(input){
 });
 </script>
 <script>
+function afficherFichiersBD(input){
+  var files = input.files;
+  var div = document.getElementById('bd-count');
+  div.style.display = 'block';
+  if(files.length === 1 && (files[0].name.endsWith('.pdf') || files[0].name.endsWith('.zip'))){
+    div.textContent = '✅ Fichier sélectionné : ' + files[0].name;
+  } else {
+    div.textContent = '✅ ' + files.length + ' image(s) sélectionnée(s) — rangées automatiquement dans l\'ordre !';
+  }
+}
+
 function afficherNbPages(input){
   var count = input.files.length;
   var div = document.getElementById('pages-count');
