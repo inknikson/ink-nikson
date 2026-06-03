@@ -4967,7 +4967,7 @@ document.addEventListener('DOMContentLoaded', function() {
   btns.forEach(function(btn) {
     btn.addEventListener('click', function(e) {
       e.preventDefault();
-      window.location.href = '/auth';
+      
     });
   });
   var allBtns = document.querySelectorAll('button, a');
@@ -4975,7 +4975,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if(btn.textContent.trim().toUpperCase().includes('CONNEXION') || btn.textContent.trim().toUpperCase().includes('S\'INSCRIRE')) {
       btn.addEventListener('click', function(e) {
         e.preventDefault();
-        window.location.href = '/auth';
+        
       });
     }
   });
