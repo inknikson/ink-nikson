@@ -4919,6 +4919,26 @@ function doRegister(){
   openModal('modal-confirm');
 }
 </script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  var btns = document.querySelectorAll('[onclick*="showAuth"], .btn-connexion, [data-action="connexion"]');
+  btns.forEach(function(btn) {
+    btn.addEventListener('click', function(e) {
+      e.preventDefault();
+      window.location.href = '/auth';
+    });
+  });
+  var allBtns = document.querySelectorAll('button, a');
+  allBtns.forEach(function(btn) {
+    if(btn.textContent.trim().toUpperCase().includes('CONNEXION') || btn.textContent.trim().toUpperCase().includes('S\'INSCRIRE')) {
+      btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        window.location.href = '/auth';
+      });
+    }
+  });
+});
+</script>
 
 
 
