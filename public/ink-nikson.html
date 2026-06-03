@@ -4940,6 +4940,13 @@ document.querySelectorAll('input[type="password"]').forEach(function(input){
 });
 </script>
 <script>
+function afficherNbPages(input){
+  var count = input.files.length;
+  var div = document.getElementById('pages-count');
+  div.style.display = 'block';
+  div.textContent = '✅ ' + count + ' page(s) sélectionnée(s) — Le site les rangera automatiquement dans l\'ordre !';
+}
+
 function soumettreNouvelleBD(){
   var titre = document.querySelector('#modal-upload input[placeholder*="titre"], #modal-upload input[placeholder*="Titre"]');
   var genre = document.querySelector('#modal-upload select');
