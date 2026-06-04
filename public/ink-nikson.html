@@ -1012,7 +1012,7 @@ window.addEventListener('load', function(){
     <div class="marquee-item">Bandes Dessinées</div><div class="marquee-item">Univers Originaux</div><div class="marquee-item">INK NIKSON</div><div class="marquee-item">Fantasy</div><div class="marquee-item">Action</div><div class="marquee-item">Sci-Fi</div><div class="marquee-item">Aventure</div><div class="marquee-item">Thriller</div>
   </div></div>
 
-  <section class="section-wrap" id="catalogue">
+  <section class="section-wrap" id="catalogue" data-loaded="false">
     <div class="section-row">
       <div><div class="section-ey">Lecture Gratuite</div><h2 class="section-h">Toutes les BD <span class="acc">Gratuites</span></h2></div>
       <button class="btn-outline-sm" id="btn-voir-plus" onclick="voirPlus()">Voir plus</button>
@@ -4961,6 +4961,53 @@ document.querySelectorAll('input[type="password"]').forEach(function(input){
 });
 </script>
 <script>
+function chargerCatalogue(){
+  if(!window.supabaseClient) { setTimeout(chargerCatalogue, 500); return; }
+  window.supabaseClient.from('series').select('*').then(function({data, error}){
+    if(error || !data || data.length === 0) return;
+    var catalogue = document.getElementById('catalogue');
+    if(!catalogue) return;
+    var grille = catalogue.querySelector('.bd-grid, .grid, [class*="grid"]');
+    if(!grille) grille = catalogue;
+    var html = '';
+    data.forEach(function(serie){
+      var cover = serie.couverture ? '<img src="'+serie.couverture+'" style="width:100%;height:100%;object-fit:cover">' : '<div class="cov-geo"></div>';
+      html += '<div class="bd-card" onclick="ouvrirSerie(\''+serie.id+'\')">'+
+        '<div class="bd-cover cov-a">'+cover+'<div class="bd-overlay"><div class="bd-read-btn">Lire</div></div></div>'+
+        '<div class="bd-footer"><div class="bd-genre">'+(serie.genre||'BD')+'</div><div class="bd-name">'+serie.titre+'</div></div>'+
+        '</div>';
+    });
+    if(html) grille.innerHTML = html;
+  });
+}
+
+function ouvrirSerie(serieId){
+  window.supabaseClient.from('chapitres').select('*').eq('serie_id', serieId).order('numero').then(function({data}){
+    if(!data || data.length === 0){ showToast('Aucun chapitre disponible !'); return; }
+    ouvrirChapitre(data[0].id);
+  });
+}
+
+function ouvrirChapitre(chapitreId){
+  window.supabaseClient.from('pages').select('*').eq('chapitre_id', chapitreId).order('numero').then(function({data}){
+    if(!data || data.length === 0){ showToast('Aucune page disponible !'); return; }
+    var reader = document.getElementById('page-reader');
+    if(!reader) return;
+    var container = reader.querySelector('.reader-pages, .pages-container, [class*="reader"]');
+    if(!container) container = reader;
+    var html = '';
+    data.forEach(function(page){
+      html += '<img src="'+page.image_url+'" style="width:100%;display:block;margin-bottom:4px" alt="Page '+page.numero+'">';
+    });
+    container.innerHTML = html;
+    showPage('reader');
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function(){
+  setTimeout(chargerCatalogue, 1000);
+});
+
 function afficherCouverture(input){
   var file = input.files[0];
   var div = document.getElementById('cover-preview');
