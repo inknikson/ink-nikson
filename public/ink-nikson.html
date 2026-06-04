@@ -543,6 +543,27 @@ tr:hover td{background:rgba(124,58,237,0.04)}
 </style>
 </head>
 <body>
+<div id="intro-screen" style="position:fixed;top:0;left:0;width:100%;height:100%;background:#0a0a0a;z-index:99999;display:flex;align-items:center;justify-content:center;flex-direction:column">
+  <div id="intro-logo" style="font-family:'Fraunces',serif;font-size:3rem;font-weight:900;opacity:0;transform:scale(0.5);transition:all 0.8s ease">
+    <span style="color:white">INK </span><span style="background:linear-gradient(135deg,#7C3AED,#EC4899);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">NIKSON</span>
+  </div>
+  <div id="intro-bar" style="width:0%;height:3px;background:linear-gradient(90deg,#7C3AED,#EC4899);margin-top:2rem;border-radius:2px;transition:width 1.5s ease"></div>
+</div>
+<script>
+window.addEventListener('load', function(){
+  setTimeout(function(){
+    document.getElementById('intro-logo').style.opacity='1';
+    document.getElementById('intro-logo').style.transform='scale(1)';
+    document.getElementById('intro-bar').style.width='200px';
+  }, 100);
+  setTimeout(function(){
+    var intro = document.getElementById('intro-screen');
+    intro.style.opacity='0';
+    intro.style.transition='opacity 0.5s ease';
+    setTimeout(function(){ intro.style.display='none'; }, 500);
+  }, 2500);
+});
+</script>
 <!-- ====== SÉCURITÉ JAVASCRIPT ====== -->
 <script>
 (function(){
