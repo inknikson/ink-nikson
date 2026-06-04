@@ -4975,7 +4975,7 @@ function soumettreNouvelleBD(){
   var titreEl = document.querySelector('#modal-upload input[type="text"]');
   var genreEl = document.querySelector('#modal-upload select');
   var bdInput = document.getElementById('bd-input');
-  var coverInput = document.querySelector('#modal-upload input[type="file"]:not(#bd-input)');
+  var coverInput = document.getElementById('cover-input');
 
   if(!titreEl || !titreEl.value){ showToast('❌ Ajoute un titre !'); return; }
   if(!window.supabaseClient){ showToast('❌ Connexion requise !'); return; }
@@ -4986,12 +4986,25 @@ function soumettreNouvelleBD(){
     if(!data.user){ showToast('❌ Tu dois être connecté !'); return; }
     var userId = data.user.id;
 
-    window.supabaseClient.from('series').insert({
-      createur_id: userId,
-      titre: titreEl.value,
-      genre: genreEl ? genreEl.value : '',
-      statut: 'en_cours'
-    }).select().single().then(function({data: serie, error}){
+    var coverFile = coverInput ? coverInput.files[0] : null;
+    var uploadCover = function(callback){
+      if(!coverFile){ callback(''); return; }
+      var coverPath = userId + '/covers/' + Date.now() + '-' + coverFile.name;
+      window.supabaseClient.storage.from('covers').upload(coverPath, coverFile).then(function({data, error}){
+        if(error){ callback(''); return; }
+        var url = window.supabaseClient.storage.from('covers').getPublicUrl(data.path).data.publicUrl;
+        callback(url);
+      });
+    };
+
+    uploadCover(function(couvertureUrl){
+      window.supabaseClient.from('series').insert({
+        createur_id: userId,
+        titre: titreEl.value,
+        genre: genreEl ? genreEl.value : '',
+        couverture: couvertureUrl,
+        statut: 'en_cours'
+      }).select().single().then(function({data: serie, error}){
       if(error){ showToast('❌ Erreur: ' + error.message); return; }
 
       var files = bdInput ? bdInput.files : null;
