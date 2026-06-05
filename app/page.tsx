@@ -23,11 +23,13 @@ document.addEventListener('DOMContentLoaded', function(){
   <div id="intro-logo" style="font-family:'Fraunces',serif;font-size:3.5rem;font-weight:900;letter-spacing:-0.02em;opacity:0;transform:scale(0.8);transition:all 0.6s cubic-bezier(0.16,1,0.3,1)">
     <span style="color:white">INK </span><span style="background:linear-gradient(135deg,#7C3AED,#EC4899);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">NIKSON</span>
   </div>
+  <div id="intro-line" style="width:0px;height:3px;background:linear-gradient(90deg,#7C3AED,#EC4899);margin-top:1.5rem;border-radius:2px;transition:width 1.8s cubic-bezier(0.16,1,0.3,1)"></div>
 </div>
 <script>
 setTimeout(function(){
   document.getElementById('intro-logo').style.opacity='1';
   document.getElementById('intro-logo').style.transform='scale(1)';
+  document.getElementById('intro-line').style.width='200px';
 },100);
 setTimeout(function(){
   var s=document.getElementById('intro-screen');
