@@ -111,7 +111,18 @@ window.addEventListener('load', function(){
     };
     var origConfirm = window.confirmPayment;
     window.confirmPayment = function(type){
-      if(type === 'sub'){
+      if(type === 'buy'){
+        var prix = window.currentBDPrix || 3.99;
+        var titre = window.currentBDTitre || 'Bande Dessinée';
+        showToast('Redirection vers le paiement...');
+        fetch('/api/checkout', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({amount: prix, bdTitle: titre})
+        }).then(function(r){ return r.json(); }).then(function(data){
+          if(data.url) window.location.href = data.url;
+        });
+      } else if(type === 'sub'){
         var priceId = STRIPE_PLANS[selectedPlan];
         if(!priceId){ showToast('Plan non trouvé !'); return; }
         showToast('Redirection vers le paiement...');
