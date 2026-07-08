@@ -143,7 +143,7 @@ window.addEventListener('load', function(){
 });
 </script>`
 
-  const catalogueScript = `
+
 <script>
 function chargerVraisBD(){
   if(!window.supabaseClient){ setTimeout(chargerVraisBD, 500); return; }
@@ -213,7 +213,7 @@ document.addEventListener('DOMContentLoaded', function(){
 
   const finalHtml = html
     .replace('<meta http-equiv="Content-Security-Policy"', '<!-- CSP disabled --><meta name="csp-disabled"')
-    .replace('<body>', '<body>' + introAnimation + createurScript + stripeScript + catalogueScript)
+    .replace('<body>', '<body>' + introAnimation + createurScript + stripeScript + catalogueScript + adminScript)
     .replace('</body>', script + '</body>')
   
   return <div dangerouslySetInnerHTML={{ __html: finalHtml }} />
