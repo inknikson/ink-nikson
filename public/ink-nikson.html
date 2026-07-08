@@ -3938,7 +3938,7 @@ function setSort(s,btn){btn.closest('.filter-row').querySelectorAll('.filter-btn
               <div style="font-size:0.6rem;color:rgba(240,238,255,0.28)">ou 2,79€ avec Passionné</div>
             </div>
           </div>
-          <button class="btn-grad" style="width:100%;padding:0.65rem!important;font-size:0.72rem!important" onclick="openModal(&#39;modal-buy&#39;)">🛒 Acheter</button>
+          <button class="btn-grad" style="width:100%;padding:0.65rem!important;font-size:0.72rem!important" onclick="window.currentBDPrix=3.99;window.currentBDTitre=this.closest('.bd-card, .shop-card, [class*=card]')?.querySelector('[class*=title], [class*=name], h3, h4')?.textContent||'BD INK NIKSON';openModal('modal-buy')">🛒 Acheter</button>
         </div>
       </div>
 
