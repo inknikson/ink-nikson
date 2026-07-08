@@ -9,7 +9,7 @@ export default function Home() {
   
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
   const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
-  
+
   const script = `<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 window.supabaseClient = null;
@@ -46,6 +46,7 @@ function soumettreNouvelleBD(){
   var titreEl = document.querySelector('#modal-upload input[type="text"]');
   var genreEl = document.querySelector('#modal-upload select');
   var coverInput = document.getElementById('cover-input');
+  var prixEl = document.getElementById('bd-prix');
   if(!titreEl || !titreEl.value){ showToast('Ajoute un titre !'); return; }
   showToast('Publication en cours...');
   window.supabaseClient.auth.getUser().then(function({data}){
@@ -65,6 +66,7 @@ function soumettreNouvelleBD(){
         titre: titreEl.value,
         genre: genreEl ? genreEl.value : '',
         couverture: coverUrl,
+        prix: parseFloat(prixEl ? prixEl.value : '3.99'),
         statut: 'en_cours'
       }).select().single().then(function({data:serie, error:err}){
         if(err){ showToast('Erreur: '+err.message); return; }
@@ -141,9 +143,78 @@ window.addEventListener('load', function(){
 });
 </script>`
 
-  const finalHtml = html.replace('<meta http-equiv="Content-Security-Policy"', '<!-- CSP disabled --><meta name="csp-disabled"')
-  .replace('<body>', '<body>' + introAnimation + createurScript + stripeScript)
-  .replace('</body>', script + '</body>')
+  const catalogueScript = `
+<script>
+function chargerVraisBD(){
+  if(!window.supabaseClient){ setTimeout(chargerVraisBD, 500); return; }
+  window.supabaseClient.from('series').select('*').then(function({data}){
+    if(!data || data.length===0) return;
+    
+    var grilleAbo = document.querySelector('[class*="bd-grid"]');
+    var grilleBoutique = document.querySelector('#page-boutique [class*="bd-grid"], #page-shop [class*="bd-grid"]');
+    
+    data.forEach(function(serie){
+      var cover = serie.couverture ? 
+        '<img src="'+serie.couverture+'" style="width:100%;height:100%;object-fit:cover;position:absolute;top:0;left:0">' : 
+        '<div class="cov-geo"></div>';
+      
+      // Carte pour abonnements (sans prix)
+      if(grilleAbo){
+        var cardAbo = document.createElement('div');
+        cardAbo.className = 'bd-card';
+        cardAbo.innerHTML = '<div class="bd-cover cov-a" style="position:relative">'+cover+'<div class="free-pill">Inclus</div><div class="cov-label"><div class="cov-ep">'+serie.genre+'</div><div class="cov-title">'+serie.titre+'</div></div><div class="bd-overlay"><div class="bd-read-btn">Lire</div></div></div><div class="bd-footer"><div class="bd-genre">'+(serie.genre||'BD')+'</div><div class="bd-name">'+serie.titre+'</div></div>';
+        cardAbo.onclick = function(){ ouvrirVraieBD(serie.id, serie.titre); };
+        grilleAbo.appendChild(cardAbo);
+      }
+      
+      // Carte pour boutique (avec prix)
+      if(grilleBoutique){
+        var cardBoutique = document.createElement('div');
+        cardBoutique.className = 'bd-card';
+        cardBoutique.innerHTML = '<div class="bd-cover cov-a" style="position:relative">'+cover+'<div class="cov-label"><div class="cov-ep">'+serie.genre+'</div><div class="cov-title">'+serie.titre+'</div></div><div class="bd-overlay"><div class="bd-read-btn">Acheter</div></div></div><div class="bd-footer"><div class="bd-genre">'+(serie.prix||'3.99')+'€</div><div class="bd-name">'+serie.titre+'</div></div>';
+        cardBoutique.onclick = function(){ 
+          window.currentBDPrix = serie.prix || 3.99;
+          window.currentBDTitre = serie.titre;
+          openModal('modal-buy'); 
+        };
+        grilleBoutique.appendChild(cardBoutique);
+      }
+    });
+  });
+}
+
+function ouvrirVraieBD(serieId, titre){
+  window.supabaseClient.from('chapitres').select('*').eq('serie_id', serieId).order('numero').then(function({data}){
+    if(!data || data.length===0){ showToast('Aucun chapitre disponible !'); return; }
+    ouvrirChapitreBD(data[0].id, titre);
+  });
+}
+
+function ouvrirChapitreBD(chapId, titre){
+  window.supabaseClient.from('pages').select('*').eq('chapitre_id', chapId).order('numero').then(function({data}){
+    if(!data || data.length===0){ showToast('Aucune page disponible !'); return; }
+    var pages = document.querySelector('.reader-pages');
+    if(!pages) return;
+    pages.innerHTML = '';
+    data.forEach(function(page){
+      var img = document.createElement('img');
+      img.src = page.image_url;
+      img.style.cssText = 'width:100%;max-width:800px;display:block;margin:0 auto 4px';
+      pages.appendChild(img);
+    });
+    showPage('reader');
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function(){
+  setTimeout(chargerVraisBD, 1500);
+});
+</script>`
+
+  const finalHtml = html
+    .replace('<meta http-equiv="Content-Security-Policy"', '<!-- CSP disabled --><meta name="csp-disabled"')
+    .replace('<body>', '<body>' + introAnimation + createurScript + stripeScript + catalogueScript)
+    .replace('</body>', script + '</body>')
   
   return <div dangerouslySetInnerHTML={{ __html: finalHtml }} />
 }
