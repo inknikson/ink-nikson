@@ -55,7 +55,8 @@ function soumettreNouvelleBD(){
     var coverFile = coverInput ? coverInput.files[0] : null;
     var uploadCover = function(cb){
       if(!coverFile){ cb(''); return; }
-      window.supabaseClient.storage.from('covers').upload(userId+'/'+Date.now()+'-'+coverFile.name, coverFile).then(function({data:d,error:e}){
+      window.supabaseClient.storage.from('covers').upl
+    oad(userId+'/'+Date.now()+'-'+coverFile.name, coverFile).then(function({data:d,error:e}){
         if(e){ cb(''); return; }
         cb(window.supabaseClient.storage.from('covers').getPublicUrl(d.path).data.publicUrl);
       });
